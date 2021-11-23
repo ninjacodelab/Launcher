@@ -64,6 +64,19 @@ namespace Launcher
             trayIcon.MouseClick += MyClickHandler;
         }
 
+        private void NewCreateMenu()
+        {
+            var newTrayMenu = new ContextMenuStrip();
+            var newStripMenuItem = new ToolStripMenuItem();
+            //Icon appIcon = new Icon(@"C:\Users\btaylor\Documents\IconTest\icon_100.ico");
+            string iconPath = @"C:\Users\btaylor\Documents\IconTest\icon_100.ico";
+            newStripMenuItem.Image = new Icon(iconPath).ToBitmap();
+            //newStripMenuItem.Image = appIcon.ToBitmap();
+
+            Icon appIcon = Icon.ExtractAssociatedIcon(@"C:\Program Files\Vivaldi\Application\vivaldi.exe");
+            newStripMenuItem.Image = appIcon.ToBitmap();
+        }
+
         private void PopulateMenu()
         {
             string configPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
