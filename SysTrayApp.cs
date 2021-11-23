@@ -11,7 +11,7 @@ namespace Launcher
         private Menu launcherMenu;
         private NotifyIcon trayIcon;
         private ContextMenu trayMenu;
-        private readonly string configFile = "_menu.cfg";
+        private readonly string configFile = "launcher.cfg";
 
         public SysTrayApp()
         {
@@ -39,7 +39,7 @@ namespace Launcher
                 // TODO: Figure out how to send a right mouse click or figure
                 //       how to get menu to display after mouse click on
                 //       desktop, at which point this will not be needed
-                var notifyIcon = sender as NotifyIcon;
+                //var notifyIcon = sender as NotifyIcon;
                 // trayMenu.Show() ?
 
                 //throw new Exception("Left mouse button clicked");
@@ -48,23 +48,20 @@ namespace Launcher
 
         private void CreateMenu()
         {
-            // Create a simple tray menu with only one item.
+            // Create a simple tray menu.
             trayMenu = new ContextMenu();
             PopulateMenu();
-            AddDefaultEntries();
 
-            // Create a tray icon. In this example we use a
-            // standard system icon for simplicity, but you
-            // can of course use your own custom icon too.
-            trayIcon = new NotifyIcon();
-            trayIcon.Text = "Launcher";
-            //trayIcon.Icon = new Icon(SystemIcons.Application, 40, 40);
-            trayIcon.Icon = new Icon("Launcher-line-40px.ico");
+            // Create a tray icon.
+            trayIcon = new NotifyIcon
+            {
+                Text = "Launcher",
+                Icon = new Icon("Launcher-line-40px.ico"),
+                ContextMenu = trayMenu,
+                Visible = true
+            };
+
             trayIcon.MouseClick += MyClickHandler;
-
-            // Add menu to tray icon and show it.
-            trayIcon.ContextMenu = trayMenu;
-            trayIcon.Visible = true;
         }
 
         private void PopulateMenu()
@@ -94,6 +91,8 @@ namespace Launcher
 
                 trayMenu.MenuItems.Add(category, items.ToArray());
             }
+
+            AddDefaultEntries();
         }
 
         private void LaunchMenuItem(object sender, EventArgs e)
@@ -136,7 +135,6 @@ namespace Launcher
             trayMenu = new ContextMenu();
 
             PopulateMenu();
-            AddDefaultEntries();
 
             trayIcon.ContextMenu = trayMenu;
             trayIcon.Visible = true;
