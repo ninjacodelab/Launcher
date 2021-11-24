@@ -9,13 +9,16 @@ namespace Launcher
     public partial class SysTrayApp : Form
     {
         private Menu launcherMenu;
-        private NotifyIcon trayIcon;
-        private ContextMenu trayMenu;
+        private NotifyIcon notifyIcon;
+        private ContextMenuStrip contextMenu;
         private readonly string configFile = "launcher.cfg";
 
         public SysTrayApp()
         {
-            CreateMenu();
+            contextMenu = new ContextMenuStrip();
+            PopulateContextMenu();
+            InitializeNotifyIcon();
+            notifyIcon.ContextMenuStrip = contextMenu;
             InitializeComponent();
         }
 
@@ -32,52 +35,17 @@ namespace Launcher
             Application.Exit();
         }
 
-        private void MyClickHandler(object sender, MouseEventArgs e)
+        private void InitializeNotifyIcon()
         {
-            if (e.Button == MouseButtons.Left)
-            {
-                // TODO: Figure out how to send a right mouse click or figure
-                //       how to get menu to display after mouse click on
-                //       desktop, at which point this will not be needed
-                //var notifyIcon = sender as NotifyIcon;
-                // trayMenu.Show() ?
-
-                //throw new Exception("Left mouse button clicked");
-            }
-        }
-
-        private void CreateMenu()
-        {
-            // Create a simple tray menu.
-            trayMenu = new ContextMenu();
-            PopulateMenu();
-
-            // Create a tray icon.
-            trayIcon = new NotifyIcon
+            notifyIcon = new NotifyIcon
             {
                 Text = "Launcher",
                 Icon = new Icon("Launcher-line-40px.ico"),
-                ContextMenu = trayMenu,
                 Visible = true
             };
-
-            trayIcon.MouseClick += MyClickHandler;
         }
 
-        private void NewCreateMenu()
-        {
-            var newTrayMenu = new ContextMenuStrip();
-            var newStripMenuItem = new ToolStripMenuItem();
-            //Icon appIcon = new Icon(@"C:\Users\btaylor\Documents\IconTest\icon_100.ico");
-            string iconPath = @"C:\Users\btaylor\Documents\IconTest\icon_100.ico";
-            newStripMenuItem.Image = new Icon(iconPath).ToBitmap();
-            //newStripMenuItem.Image = appIcon.ToBitmap();
-
-            Icon appIcon = Icon.ExtractAssociatedIcon(@"C:\Program Files\Vivaldi\Application\vivaldi.exe");
-            newStripMenuItem.Image = appIcon.ToBitmap();
-        }
-
-        private void PopulateMenu()
+        private void PopulateContextMenu()
         {
             string configPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             launcherMenu = new Menu($"{configPath}\\{configFile}");
@@ -87,30 +55,35 @@ namespace Launcher
 
             foreach (var category in categories)
             {
-                List<MenuItem> items = new List<MenuItem>();
+                var submenu = new ToolStripMenuItem
+                {
+                    Text = category
+                };
 
                 foreach (var entry in launcherMenu.Entries)
                 {
                     if (entry.Category == category)
                     {
-                        var item = new MenuItem
+                        var item = new ToolStripMenuItem
                         {
                             Text = entry.Name
                         };
-                        item.Click += LaunchMenuItem;
-                        items.Add(item);
+                        Icon appIcon = Icon.ExtractAssociatedIcon(entry.Path);
+                        item.Image = appIcon.ToBitmap();
+                        item.Click += MenuItem_Click;
+                        submenu.DropDownItems.Add(item);
                     }
                 }
 
-                trayMenu.MenuItems.Add(category, items.ToArray());
+                contextMenu.Items.Add(submenu);
             }
 
             AddDefaultEntries();
         }
 
-        private void LaunchMenuItem(object sender, EventArgs e)
+        private void MenuItem_Click(object sender, EventArgs e)
         {
-            MenuItem item = sender as MenuItem;
+            ToolStripMenuItem item = sender as ToolStripMenuItem;
             string menuItemTarget = string.Empty;
             string targetArguments = string.Empty;
 
@@ -143,25 +116,14 @@ namespace Launcher
 
         private void RefreshMenu(object sender, EventArgs e)
         {
-            trayIcon.Visible = false;
-            trayMenu.Dispose();
-            trayMenu = new ContextMenu();
+            notifyIcon.Visible = false;
+            contextMenu.Dispose();
+            contextMenu = new ContextMenuStrip();
 
-            PopulateMenu();
+            PopulateContextMenu();
 
-            trayIcon.ContextMenu = trayMenu;
-            trayIcon.Visible = true;
-        }
-
-        private void AddDefaultEntries()
-        {
-            trayMenu.MenuItems.Add("-");
-            trayMenu.MenuItems.Add("Calculator", RunCalculator);
-            trayMenu.MenuItems.Add("Notepad", RunNotepad);
-            trayMenu.MenuItems.Add("Terminal", RunTerminal);
-            trayMenu.MenuItems.Add("-");
-            trayMenu.MenuItems.Add("Refresh", RefreshMenu);
-            trayMenu.MenuItems.Add("Exit", OnExit);
+            notifyIcon.ContextMenuStrip = contextMenu;
+            notifyIcon.Visible = true;
         }
 
         private List<string> GetCategories(List<MenuEntry> entries)
@@ -177,6 +139,38 @@ namespace Launcher
             }
 
             return categoryList;
+        }
+
+        private void AddDefaultEntries()
+        {
+            contextMenu.Items.Add(new ToolStripSeparator());
+
+            ToolStripMenuItem calculatorApp = new ToolStripMenuItem();
+            calculatorApp.Text = "Calculator";
+            calculatorApp.Click += RunCalculator;
+            contextMenu.Items.Add(calculatorApp);
+
+            ToolStripMenuItem notepadApp = new ToolStripMenuItem();
+            notepadApp.Text = "Notepad";
+            notepadApp.Click += RunNotepad;
+            contextMenu.Items.Add(notepadApp);
+
+            ToolStripMenuItem terminalApp = new ToolStripMenuItem();
+            terminalApp.Text = "Terminal";
+            terminalApp.Click += RunTerminal;
+            contextMenu.Items.Add(terminalApp);
+
+            contextMenu.Items.Add(new ToolStripSeparator());
+
+            ToolStripMenuItem refreshMenu = new ToolStripMenuItem();
+            refreshMenu.Text = "Refresh";
+            refreshMenu.Click += RefreshMenu;
+            contextMenu.Items.Add(refreshMenu);
+
+            ToolStripMenuItem exitMenu = new ToolStripMenuItem();
+            exitMenu.Text = "Exit";
+            exitMenu.Click += OnExit;
+            contextMenu.Items.Add(exitMenu);
         }
 
         private void RunCalculator(object sender, EventArgs e)
