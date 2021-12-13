@@ -154,23 +154,6 @@ namespace Launcher
         {
             contextMenu.Items.Add(new ToolStripSeparator());
 
-            ToolStripMenuItem calculatorApp = new ToolStripMenuItem();
-            calculatorApp.Text = "Calculator";
-            calculatorApp.Click += RunCalculator;
-            contextMenu.Items.Add(calculatorApp);
-
-            ToolStripMenuItem notepadApp = new ToolStripMenuItem();
-            notepadApp.Text = "Notepad";
-            notepadApp.Click += RunNotepad;
-            contextMenu.Items.Add(notepadApp);
-
-            ToolStripMenuItem terminalApp = new ToolStripMenuItem();
-            terminalApp.Text = "Terminal";
-            terminalApp.Click += RunTerminal;
-            contextMenu.Items.Add(terminalApp);
-
-            contextMenu.Items.Add(new ToolStripSeparator());
-
             ToolStripMenuItem configureMenu = new ToolStripMenuItem();
             configureMenu.Text = "Configure";
             configureMenu.Click += ConfigureMenu;
@@ -185,27 +168,6 @@ namespace Launcher
             exitMenu.Text = "Exit";
             exitMenu.Click += OnExit;
             contextMenu.Items.Add(exitMenu);
-        }
-
-        private void RunCalculator(object sender, EventArgs e)
-        {
-            Process calculator = new Process();
-            calculator.StartInfo.FileName = "calc.exe";
-            calculator.Start();
-        }
-
-        private void RunNotepad(object sender, EventArgs e)
-        {
-            Process notepad = new Process();
-            notepad.StartInfo.FileName = "notepad.exe";
-            notepad.Start();
-        }
-
-        private void RunTerminal(object sender, EventArgs e)
-        {
-            Process notepad = new Process();
-            notepad.StartInfo.FileName = "wt.exe";
-            notepad.Start();
         }
     }
 }
