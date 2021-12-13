@@ -13,7 +13,7 @@ namespace Launcher
         public Menu(string configFile)
         {
             if (!File.Exists(configFile))
-                throw new ArgumentException($"{configFile} does not exist.");
+                return;
 
             string line;
             var filestream = new FileStream(configFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);

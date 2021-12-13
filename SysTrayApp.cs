@@ -40,7 +40,7 @@ namespace Launcher
             notifyIcon = new NotifyIcon
             {
                 Text = "Launcher",
-                Icon = new Icon("Launcher-line-40px.ico"),
+                Icon = new Icon("Launcher-40px.ico"),
                 Visible = true
             };
         }
@@ -126,6 +126,15 @@ namespace Launcher
             notifyIcon.Visible = true;
         }
 
+        private void ConfigureMenu(object sender, EventArgs e)
+        {
+            string configPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            Process notepad = new Process();
+            notepad.StartInfo.FileName = "notepad.exe";
+            notepad.StartInfo.Arguments = $" {configPath}\\{configFile}";
+            notepad.Start();
+        }
+
         private List<string> GetCategories(List<MenuEntry> entries)
         {
             List<string> categoryList = new List<string>();
@@ -161,6 +170,11 @@ namespace Launcher
             contextMenu.Items.Add(terminalApp);
 
             contextMenu.Items.Add(new ToolStripSeparator());
+
+            ToolStripMenuItem configureMenu = new ToolStripMenuItem();
+            configureMenu.Text = "Configure";
+            configureMenu.Click += ConfigureMenu;
+            contextMenu.Items.Add(configureMenu);
 
             ToolStripMenuItem refreshMenu = new ToolStripMenuItem();
             refreshMenu.Text = "Refresh";
